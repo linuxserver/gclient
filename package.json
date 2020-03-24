@@ -1,0 +1,21 @@
+{
+  "name": "GClient",
+  "version": "0.0.1",
+  "description": "LinuxServer Guacamole Client",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/linuxserver/gclient.git"
+  },
+  "author": "thelamer",
+  "license": "GPLV3",
+  "homepage": "https://www.linuxserver.io/",
+  "dependencies": {
+    "ejs": "^2.7.1",
+    "express": "^4.17.1",
+    "guacamole-lite": "^0.6.2"
+  }
+}
