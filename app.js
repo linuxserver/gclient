@@ -6,6 +6,7 @@ var ejs = require('ejs');
 var express = require('express');
 var app = require('express')();
 var http = require('http').Server(app);
+var CUSTOM_PORT = process.env.CUSTOM_PORT || 3000;
 
 ///// Guac Websocket Tunnel ////
 var GuacamoleLite = require('guacamole-lite');
@@ -71,7 +72,7 @@ app.get("/", function (req, res) {
 });
 
 
-// Spin up application on port 3000
-http.listen(3000, function(){
-  console.log('listening on *:3000');
+// Spin up application on CUSTOM_PORT with fallback to port 3000
+http.listen(CUSTOM_PORT, function(){
+  console.log('listening on *:' + CUSTOM_PORT);
 });
