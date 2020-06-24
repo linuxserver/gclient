@@ -74,5 +74,5 @@ app.get("/", function (req, res) {
 
 // Spin up application on CUSTOM_PORT with fallback to port 3000
 http.listen(CUSTOM_PORT, function(){
-  console.log('listening on *:', CUSTOM_PORT);
+  console.log('listening on *:' + CUSTOM_PORT);
 });
