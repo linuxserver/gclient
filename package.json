@@ -1,6 +1,6 @@
 {
   "name": "GClient",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "LinuxServer Guacamole Client",
   "main": "app.js",
   "scripts": {
@@ -16,6 +16,6 @@
   "dependencies": {
     "ejs": "^2.7.1",
     "express": "^4.17.1",
-    "guacamole-lite": "^0.6.2"
+    "guacamole-lite": "^0.6.3"
   }
 }
