@@ -1,6 +1,6 @@
 //// Application Variables ////
 var crypto = require('crypto');
-var PASSWORD = process.env.PASSWORD || abc;
+var PASSWORD = process.env.PASSWORD || 'abc';
 
 ///// Guac Websocket Tunnel ////
 var clientOptions = {
