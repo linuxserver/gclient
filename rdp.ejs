@@ -37,14 +37,11 @@
       ClipBoard:<br>
       <textarea id="clipboard" class="stopcapture form-control" rows="7"></textarea>
       <!-- File Browser launcher -->
-      <form action="/files" method="post">
+      <form action="/files" method="post" target="_blank">
         File Browser:<br>
-        <input type="password" value="abc" class="stopcapture form-control" required>
+        <input type="password" value="abc" class="stopcapture form-control" name="password" placeholder="User Password" required>
         <center><button type="submit" style="cursor:pointer;" class="btn btn-secondary">Launch</button></center>
       </form>
-      <!-- Clipboard -->
-      ClipBoard:<br>
-      <textarea id="clipboard" class="stopcapture form-control" rows="7"></textarea>
     </div>
     <!--On Screen Keyboard Modal-->
     <div id="Keyboard" data-backdrop="false" class="modal fade lsosk" tabindex="-1" style="cursor:initial;">
