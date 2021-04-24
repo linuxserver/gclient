@@ -32,15 +32,15 @@
     <div id="sidebar" style="cursor:initial;display:none;width:200px;height:100%;background:#353430;padding: 5px 10px;color:white;">
       <!-- On Screen Keyboard Launcher -->
       <button type="button" class="close" aria-label="Close" style="color:white;" onclick="closeside()"><span aria-hidden="true">x</span></button>
-      <center><button type="button" style="cursor:pointer;" class="btn btn-secondary" data-toggle="modal" data-target="#Keyboard" onclick="poposk()">Touch <i class="far fa-keyboard"></i></button></center>
+      <center><button type="button" style="cursor:pointer;" class="btn btn-secondary" onclick="poposk()">Touch <i class="far fa-keyboard"></i></button></center>
       <!-- Clipboard -->
       ClipBoard:<br>
       <textarea id="clipboard" class="stopcapture form-control" rows="7"></textarea>
       <!-- File Browser launcher -->
-      <form action="/files" method="post" target="_blank">
-        File Browser:<br>
-        <input type="password" value="abc" class="stopcapture form-control" name="password" placeholder="User Password" required>
-        <center><button type="submit" style="cursor:pointer;" class="btn btn-secondary">Launch</button></center>
+      <form id="filesform" action="/files" method="post" target="files_frame">
+        Password:<br>
+        <input type="password" value="abc" class="stopcapture form-control" name="password" placeholder="User Password" required><br>
+        <center><button type="submit" style="cursor:pointer;" class="btn btn-secondary">Files <i class="far fa-file"></i></button></center>
       </form>
     </div>
     <!--On Screen Keyboard Modal-->
@@ -53,6 +53,17 @@
           </div>
         </div>
       </div>
+    <!--File Browser Modal-->
+    <div id="files" class="modal fade" tabindex="-1" style="cursor:initial;">
+      <div class="modal-dialog" style="max-width:90%!important">
+        <div class="modal-content">
+          <div id="files_body" class="modal-body" style="height:90vh!important">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <iframe id="files_frame" name="files_frame" src="/files" frameborder="0"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
     </div>
     <!-- Fake checkbox to show/hide the sidebar -->
     <input type="checkbox" id="nav-trigger" class="nav-trigger" />
