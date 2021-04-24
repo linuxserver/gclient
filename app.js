@@ -6,6 +6,10 @@ var ejs = require('ejs');
 var express = require('express');
 var app = require('express')();
 var http = require('http').Server(app);
+var cloudcmd = require('cloudcmd');
+var io = require('socket.io');
+var bodyParser = require('body-parser');
+var { pamAuthenticate, pamErrors } = require('node-linux-pam');
 var CUSTOM_PORT = process.env.CUSTOM_PORT || 3000;
 
 ///// Guac Websocket Tunnel ////
@@ -70,7 +74,42 @@ app.get("/", function (req, res) {
   }
   res.render(__dirname + '/rdp.ejs', {token : connectionstring});
 });
-
+//// Web File Browser ////
+app.use(bodyParser.urlencoded({ extended: true }));
+var socket = io(http, {path: 'files/socket.io'});
+app.get('/files', function (req, res) {
+  res.send('Unauthorized');
+  res.end();
+});
+app.post('/files', function(req, res, next){
+  var password = req.body.password;
+  var options = {
+    username: 'abc',
+    password: password,
+  };
+  pamAuthenticate(options, function(err, code) {
+    if (!err) {
+      next();	
+    } else {
+      res.send('Unauthorized');
+      res.end();
+    }
+  });
+});
+app.use('/files', cloudcmd({
+  socket,
+  config: {
+    root: '/config',
+    prefix: '/files',
+    terminal: false,
+    console: false,
+    configDialog: false,
+    contact: false,
+    auth: false,
+    name: 'Files',
+    log: false,
+  }
+}))
 
 // Spin up application on CUSTOM_PORT with fallback to port 3000
 http.listen(CUSTOM_PORT, function(){
