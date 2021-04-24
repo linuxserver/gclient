@@ -7,7 +7,6 @@ var express = require('express');
 var app = require('express')();
 var http = require('http').Server(app);
 var cloudcmd = require('cloudcmd');
-var io = require('socket.io');
 var bodyParser = require('body-parser');
 var { pamAuthenticate, pamErrors } = require('node-linux-pam');
 var CUSTOM_PORT = process.env.CUSTOM_PORT || 3000;
@@ -76,7 +75,6 @@ app.get("/", function (req, res) {
 });
 //// Web File Browser ////
 app.use(bodyParser.urlencoded({ extended: true }));
-var socket = io(http, {path: 'files/socket.io'});
 app.get('/files', function (req, res) {
   res.send('Unauthorized');
   res.end();
@@ -97,9 +95,8 @@ app.post('/files', function(req, res, next){
   });
 });
 app.use('/files', cloudcmd({
-  socket,
   config: {
-    root: '/config',
+    root: '/',
     prefix: '/files',
     terminal: false,
     console: false,
@@ -108,6 +105,8 @@ app.use('/files', cloudcmd({
     auth: false,
     name: 'Files',
     log: false,
+    keysPanel: false,
+    oneFilePanel: true,
   }
 }))
 

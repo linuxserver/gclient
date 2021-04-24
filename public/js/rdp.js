@@ -152,10 +152,24 @@ function poposk(){
   };
   $('#osk').empty();
   $('#osk').append(osk.getElement());
+  // Launch Modal
+  $('#Keyboard').appendTo('body').modal('show');
   // Resize keyboard to the width of the screen
   osk.resize($(window).width());
 }
 
+// When file browser is launched open modal
+$('#filesform').on('submit', function() {
+  if ($('#nav-trigger').prop('checked') == true){
+    $('#nav-trigger').prop('checked', false);
+    $('#sidebaricon').empty();
+    side_close();
+    $('#sidebaricon').append('<i class="fa fa-arrow-right"></i>');
+  }
+  $('#files').appendTo('body').modal('show');
+  $("#files_frame").width(100 + '%');
+  $("#files_frame").height(90 + '%');
+});
 
 // RDP Resize window logic
 var resizeId;
