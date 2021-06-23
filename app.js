@@ -1,6 +1,7 @@
 // LinuxServer Guacamole Client
 
 //// Application Variables ////
+var baseurl = process.env.SUBFOLDER || '/';
 var crypto = require('crypto');
 var ejs = require('ejs');
 var express = require('express');
@@ -23,7 +24,7 @@ var clientOptions = {
   }
 };
 // Spinup the Guac websocket proxy on port 3000 if guacd is running
-var guacServer = new GuacamoleLite({server: http,path:'/guaclite'},{host:'127.0.0.1',port:4822},clientOptions);
+var guacServer = new GuacamoleLite({server: http,path:baseurl +'guaclite'},{host:'127.0.0.1',port:4822},clientOptions);
 // Function needed to encrypt the token string for guacamole connections
 var encrypt = (value) => {
   var iv = crypto.randomBytes(16);
@@ -71,7 +72,7 @@ app.get("/", function (req, res) {
         }
       });
   }
-  res.render(__dirname + '/rdp.ejs', {token : connectionstring});
+  res.render(__dirname + '/rdp.ejs', {token : connectionstring, baseurl: baseurl});
 });
 //// Web File Browser ////
 app.use(bodyParser.urlencoded({ extended: true }));
