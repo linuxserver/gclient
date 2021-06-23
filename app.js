@@ -10,6 +10,8 @@ var cloudcmd = require('cloudcmd');
 var bodyParser = require('body-parser');
 var { pamAuthenticate, pamErrors } = require('node-linux-pam');
 var CUSTOM_PORT = process.env.CUSTOM_PORT || 3000;
+var BASE_URL = process.env.BASE_URL || '/';
+var baseRouter = express.Router();
 
 ///// Guac Websocket Tunnel ////
 var GuacamoleLite = require('guacamole-lite');
@@ -23,7 +25,7 @@ var clientOptions = {
   }
 };
 // Spinup the Guac websocket proxy on port 3000 if guacd is running
-var guacServer = new GuacamoleLite({server: http,path:'/guaclite'},{host:'127.0.0.1',port:4822},clientOptions);
+var guacServer = new GuacamoleLite({server: http,path:BASE_URL + '/guaclite'},{host:'127.0.0.1',port:4822},clientOptions);
 // Function needed to encrypt the token string for guacamole connections
 var encrypt = (value) => {
   var iv = crypto.randomBytes(16);
@@ -38,9 +40,9 @@ var encrypt = (value) => {
 };
 
 //// Public JS and CSS ////
-app.use('/public', express.static(__dirname + '/public'));
+baseRouter.use('/public', express.static(__dirname + '/public'));
 //// Embedded guac ////
-app.get("/", function (req, res) {
+baseRouter.get("/", function (req, res) {
  if (req.query.login){
     var connectionstring = encrypt(
       {
@@ -74,12 +76,12 @@ app.get("/", function (req, res) {
   res.render(__dirname + '/rdp.ejs', {token : connectionstring});
 });
 //// Web File Browser ////
-app.use(bodyParser.urlencoded({ extended: true }));
-app.get('/files', function (req, res) {
+baseRouter.use(bodyParser.urlencoded({ extended: true }));
+baseRouter.get('/files', function (req, res) {
   res.send('Unauthorized');
   res.end();
 });
-app.post('/files', function(req, res, next){
+baseRouter.post('/files', function(req, res, next){
   var password = req.body.password;
   var options = {
     username: 'abc',
@@ -94,7 +96,7 @@ app.post('/files', function(req, res, next){
     }
   });
 });
-app.use('/files', cloudcmd({
+baseRouter.use('/files', cloudcmd({
   config: {
     root: '/',
     prefix: '/files',
@@ -109,6 +111,8 @@ app.use('/files', cloudcmd({
     oneFilePanel: true,
   }
 }))
+
+app.use(BASE_URL, baseRouter);
 
 // Spin up application on CUSTOM_PORT with fallback to port 3000
 http.listen(CUSTOM_PORT, function(){
