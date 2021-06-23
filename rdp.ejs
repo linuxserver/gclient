@@ -37,7 +37,7 @@
       ClipBoard:<br>
       <textarea id="clipboard" class="stopcapture form-control" rows="7"></textarea>
       <!-- File Browser launcher -->
-      <form id="filesform" action="/files" method="post" target="files_frame">
+      <form id="filesform" action="<%= baseurl %>files" method="post" target="files_frame">
         Password:<br>
         <input type="password" value="abc" class="stopcapture form-control" name="password" placeholder="User Password" required><br>
         <center><button type="submit" style="cursor:pointer;" class="btn btn-secondary">Files <i class="far fa-file"></i></button></center>
@@ -59,7 +59,7 @@
         <div class="modal-content">
           <div id="files_body" class="modal-body" style="height:90vh!important">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <iframe id="files_frame" name="files_frame" src="/files" frameborder="0"></iframe>
+            <iframe id="files_frame" name="files_frame" src="<%= baseurl %>files" frameborder="0"></iframe>
           </div>
         </div>
       </div>
