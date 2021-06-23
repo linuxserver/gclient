@@ -11,6 +11,7 @@ var cloudcmd = require('cloudcmd');
 var bodyParser = require('body-parser');
 var { pamAuthenticate, pamErrors } = require('node-linux-pam');
 var CUSTOM_PORT = process.env.CUSTOM_PORT || 3000;
+var baserouter = express.Router();
 
 ///// Guac Websocket Tunnel ////
 var GuacamoleLite = require('guacamole-lite');
@@ -39,9 +40,9 @@ var encrypt = (value) => {
 };
 
 //// Public JS and CSS ////
-app.use('/public', express.static(__dirname + '/public'));
+baserouter.use('/public', express.static(__dirname + '/public'));
 //// Embedded guac ////
-app.get("/", function (req, res) {
+baserouter.get("/", function (req, res) {
  if (req.query.login){
     var connectionstring = encrypt(
       {
@@ -75,12 +76,12 @@ app.get("/", function (req, res) {
   res.render(__dirname + '/rdp.ejs', {token : connectionstring, baseurl: baseurl});
 });
 //// Web File Browser ////
-app.use(bodyParser.urlencoded({ extended: true }));
-app.get('/files', function (req, res) {
+baserouter.use(bodyParser.urlencoded({ extended: true }));
+baserouter.get('/files', function (req, res) {
   res.send('Unauthorized');
   res.end();
 });
-app.post('/files', function(req, res, next){
+baserouter.post('/files', function(req, res, next){
   var password = req.body.password;
   var options = {
     username: 'abc',
@@ -95,7 +96,7 @@ app.post('/files', function(req, res, next){
     }
   });
 });
-app.use('/files', cloudcmd({
+baserouter.use('/files', cloudcmd({
   config: {
     root: '/',
     prefix: '/files',
@@ -112,6 +113,7 @@ app.use('/files', cloudcmd({
 }))
 
 // Spin up application on CUSTOM_PORT with fallback to port 3000
+app.use(baseurl, baserouter);
 http.listen(CUSTOM_PORT, function(){
   console.log('listening on *:' + CUSTOM_PORT);
 });
