@@ -99,7 +99,7 @@ baserouter.post('/files', function(req, res, next){
 baserouter.use('/files', cloudcmd({
   config: {
     root: '/',
-    prefix: '/files',
+    prefix: baseurl + 'files',
     terminal: false,
     console: false,
     configDialog: false,
