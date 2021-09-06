@@ -1,4 +1,6 @@
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
 
 /**
  * Function needed to encrypt the token string for guacamole connections
@@ -59,8 +61,29 @@ const deepMerge = (target, source) => {
   return output;
 };
 
+/**
+ * Loads the credential config file from disk
+ * @param {string} dir
+ * @returns {object}
+ */
+const loadConfig = (dir) => {
+  const configPath = path.join(dir, 'config.json');
+
+  // Check if the config file exists (it always should but if it somehow isn't
+  // set or removed we default to our known abc/abc creds)
+  if (!fs.existsSync(configPath)) {
+    return {
+      username: 'abc',
+      password: 'abc',
+    };
+  }
+
+  return JSON.parse(fs.readFileSync(configPath));
+};
+
 module.exports = {
   encrypt,
   trimTrailingSlash,
   deepMerge,
+  loadConfig,
 };

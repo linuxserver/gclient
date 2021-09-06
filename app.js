@@ -6,8 +6,14 @@ const cloudcmd = require('cloudcmd');
 const bodyParser = require('body-parser');
 const { pamAuthenticate } = require('node-linux-pam');
 const GuacamoleLite = require('guacamole-lite');
+
 const { clientOptions, connectionOptions } = require('./options');
-const { encrypt, trimTrailingSlash, deepMerge } = require('./utils');
+const {
+  encrypt,
+  trimTrailingSlash,
+  deepMerge,
+  loadConfig,
+} = require('./utils');
 
 // Application Variables
 const baseurl = process.env.SUBFOLDER || '/';
@@ -19,9 +25,10 @@ app.set('x-powered-by', false);
 
 const server = http.Server(app);
 const baserouter = express.Router();
+const credentials = loadConfig(__dirname);
 
 // Spinup the Guac websocket proxy on port 3000 if guacd is running
-// // eslint-disable-next-line no-unused-vars
+// eslint-disable-next-line no-unused-vars
 const guacServer = new GuacamoleLite({
   server,
   path: '/guaclite',
@@ -41,10 +48,7 @@ baserouter.get('/', (req, res) => {
     ? encrypt(connectionOptions, cypher, key)
     : encrypt(deepMerge(connectionOptions, {
       connection: {
-        settings: {
-          username: 'abc',
-          password: 'abc',
-        },
+        settings: credentials,
       },
     }), cypher, key);
 
@@ -64,7 +68,7 @@ baserouter.get('/files', (req, res) => {
 
 baserouter.post('/files', (req, res, next) => {
   pamAuthenticate({
-    username: 'abc',
+    username: credentials.username,
     password: req.body.password,
   }, (err) => {
     if (err) {

@@ -1,12 +1,12 @@
 const { clientOptions, connectionOptions } = require('./options');
-const { encrypt, deepMerge } = require('./utils');
+const { encrypt, deepMerge, loadConfig } = require('./utils');
 
-const PASSWORD = process.env.PASSWORD || 'abc';
+const credentials = loadConfig(__dirname);
 const options = deepMerge(connectionOptions, {
   connection: {
     settings: {
       username: 'abc',
-      password: PASSWORD,
+      password: credentials.password,
     },
   },
 });
