@@ -3,7 +3,6 @@ const path = require('path');
 const express = require('express');
 const http = require('http');
 const cloudcmd = require('cloudcmd');
-const bodyParser = require('body-parser');
 const { pamAuthenticate } = require('node-linux-pam');
 const GuacamoleLite = require('guacamole-lite');
 
@@ -59,7 +58,8 @@ baserouter.get('/', (req, res) => {
 });
 
 // Web File Browser
-baserouter.use(bodyParser.urlencoded({ extended: true }));
+baserouter.use(express.json());
+baserouter.use(express.urlencoded());
 
 baserouter.get('/files', (req, res) => {
   res.send('Unauthorized');
