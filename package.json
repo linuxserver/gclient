@@ -4,7 +4,7 @@
   "description": "LinuxServer Guacamole Client",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --coverage --detectOpenHandles",
     "lint": "eslint *.js"
   },
   "repository": {
@@ -24,6 +24,9 @@
   "devDependencies": {
     "eslint": "^7.32.0",
     "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-plugin-import": "^2.23.4"
+    "eslint-plugin-import": "^2.23.4",
+    "jest": "^27.1.0",
+    "jsdom": "^17.0.0",
+    "supertest": "^6.1.6"
   }
 }
