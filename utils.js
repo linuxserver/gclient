@@ -6,7 +6,7 @@ const path = require('path');
  * Function needed to encrypt the token string for guacamole connections
  * @param {object} value - the value to encrypt
  * @param {string} algorithm - the algorithm to use to encrypt
- * @param {string} key - the key to encrypt
+ * @param {string} key - the key to encrypt with
  * @returns {string} a base64 encoded string containing the encrypted data
  */
 const encrypt = (value, algorithm, key) => {
@@ -19,6 +19,20 @@ const encrypt = (value, algorithm, key) => {
     iv: iv.toString('base64'),
     value: crypted,
   })).toString('base64');
+};
+
+/**
+ * Function to decrypt the guacamole connection token string
+ * @param {string} ciphertext - the encrypted ciphertext
+ * @param {*} algorithm - the algorithm used in encryption
+ * @param {*} key - the key used in encryption
+ * @param {*} iv - the base64-encoded iv used in encryption
+ * @returns {string} the decrypted ciphertext
+ */
+const decrypt = (ciphertext, algorithm, key, iv) => {
+  const decipher = crypto.createDecipheriv(algorithm, key, Buffer.from(iv, 'base64'));
+  const decrypted = decipher.update(ciphertext, 'base64', 'utf8');
+  return (decrypted + decipher.final('utf8'));
 };
 
 /**
@@ -83,6 +97,7 @@ const loadConfig = (dir) => {
 
 module.exports = {
   encrypt,
+  decrypt,
   trimTrailingSlash,
   deepMerge,
   loadConfig,
