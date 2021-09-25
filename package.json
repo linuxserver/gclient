@@ -16,6 +16,6 @@
   "dependencies": {
     "ejs": "^2.7.1",
     "express": "^4.17.1",
-    "guacamole-lite": "^0.6.3"
+    "guacamole-lite": "0.6.3"
   }
 }
