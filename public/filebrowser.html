@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="css/filebrowser.css">
+    <script type="text/javascript" src="js/vendor/jquery.min.js"></script>
+    <script type="text/javascript" src="js/filebrowser.js"></script>
+  </head>
+  <body>
+  <p>Password: <input id="pass" type="password" value="abc"></input></p>
+  <span id="buttons">
+    <input id="folderName" type="text" placeholder="Enter Directory Name"></input>
+    <button onclick="createFolder()">Create Folder</button>
+    <button onclick="$('#uploadInput').trigger( 'click' )">Upload Files</button>
+    <input class="hidden" id="uploadInput" type='file' onchange="upload(this);" multiple>
+  </span>
+  <div id="filebrowser"></div>
+  <div ondrop="dropFiles(event)" ondragover="allowDrop(event)" style="visibility:hidden;opacity:0" id="dropzone">
+  </div>
+  </body>
+</html>

@@ -1,6 +1,6 @@
 {
   "name": "GClient",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "LinuxServer Guacamole Client",
   "main": "app.js",
   "scripts": {
@@ -15,7 +15,6 @@
   "homepage": "https://www.linuxserver.io/",
   "dependencies": {
     "body-parser": "^1.19.0",
-    "cloudcmd": "^15.9.6",
     "ejs": "^3.1.6",
     "express": "^4.17.1",
     "guacamole-lite": "0.6.3",

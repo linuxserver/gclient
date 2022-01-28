@@ -2,16 +2,19 @@
 
 //// Application Variables ////
 var baseurl = process.env.SUBFOLDER || '/';
+var socketIO = require('socket.io');
 var crypto = require('crypto');
 var ejs = require('ejs');
 var express = require('express');
 var app = require('express')();
 var http = require('http').Server(app);
-var cloudcmd = require('cloudcmd');
 var bodyParser = require('body-parser');
 var { pamAuthenticate, pamErrors } = require('node-linux-pam');
 var CUSTOM_PORT = process.env.CUSTOM_PORT || 3000;
-var baserouter = express.Router();
+var PASSWORD = process.env.PASSWORD || 'abc';
+var FORCE_LOGIN = process.env.FORCE_LOGIN || false;
+var baseRouter = express.Router();
+var fs = require('fs').promises;
 
 ///// Guac Websocket Tunnel ////
 var GuacamoleLite = require('guacamole-lite');
@@ -36,52 +39,34 @@ var encrypt = (value) => {
     iv: iv.toString('base64'),
     value: crypted
   };
-  return new Buffer(JSON.stringify(data)).toString('base64');
+  return new Buffer.from(JSON.stringify(data)).toString('base64');
 };
 
 //// Public JS and CSS ////
-baserouter.use('/public', express.static(__dirname + '/public'));
+baseRouter.use(express.static(__dirname + '/public'));
 //// Embedded guac ////
-baserouter.get("/", function (req, res) {
- if (req.query.login){
-    var connectionstring = encrypt(
-      {
-        "connection":{
-          "type":"rdp",
-          "settings":{
-            "hostname":"127.0.0.1",
-            "port":"3389",
-            "security": "any",
-            "ignore-cert": true
-          }
-        }
-      });
+baseRouter.get('/', function (req, res) {
+  let connectString = {
+    'connection':{
+      'type':'rdp',
+      'settings':{
+        'hostname':'127.0.0.1',
+        'port':'3389',
+        'security': 'any',
+        'ignore-cert': true
+      }
+    }
+  };
+  if ((! req.query.login) && (FORCE_LOGIN == false)) {
+    Object.assign(connectString.connection.settings, {'username':'abc','password':PASSWORD});
   }
-  else{
-    var connectionstring = encrypt(
-      {
-        "connection":{
-          "type":"rdp",
-          "settings":{
-            "hostname":"127.0.0.1",
-            "port":"3389",
-            "username":"abc",
-            "password":"abc",
-            "security": "any",
-            "ignore-cert": true
-          }
-        }
-      });
-  }
-  res.render(__dirname + '/rdp.ejs', {token : connectionstring, baseurl: baseurl});
+  res.render(__dirname + '/rdp.ejs', {token : encrypt(connectString)});
 });
 //// Web File Browser ////
-baserouter.use(bodyParser.urlencoded({ extended: true }));
-baserouter.get('/files', function (req, res) {
-  res.send('Unauthorized');
-  res.end();
+baseRouter.get('/files', function (req, res) {
+  res.sendFile( __dirname + '/public/filebrowser.html');
 });
-baserouter.post('/files', function(req, res, next){
+baseRouter.post('/files', function(req, res, next){
   var password = req.body.password;
   var options = {
     username: 'abc',
@@ -96,24 +81,9 @@ baserouter.post('/files', function(req, res, next){
     }
   });
 });
-baserouter.use('/files', cloudcmd({
-  config: {
-    root: '/',
-    prefix: baseurl + 'files',
-    terminal: false,
-    console: false,
-    configDialog: false,
-    contact: false,
-    auth: false,
-    name: 'Files',
-    log: false,
-    keysPanel: false,
-    oneFilePanel: true,
-  }
-}))
 
 // Spin up application on CUSTOM_PORT with fallback to port 3000
-app.use(baseurl, baserouter);
+app.use(baseurl, baseRouter);
 http.listen(CUSTOM_PORT, function(){
   console.log('listening on *:' + CUSTOM_PORT);
 });

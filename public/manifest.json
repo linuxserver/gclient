@@ -1,0 +1,17 @@
+{
+  "name": "LinuxServer Guacamole Client",
+  "short_name": "RDP Client",
+  "manifest_version": 2,
+  "version": "0.2.0",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "icon.png",
+      "type": "image/png",
+      "sizes": "180x180"
+    }
+  ],
+  "start_url": "/"
+}
