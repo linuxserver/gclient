@@ -1,1 +1,70 @@
+.hidden {
+  display: none;
+}
 
+.right {
+  float: right;
+  margin-right: 5px;
+}
+
+.directory, .file {
+  cursor: pointer;
+}
+
+button {
+  border: 2px solid #000;
+  background: transparent;
+  cursor: pointer;
+  margin: 5px;
+}
+
+.deleteButton {
+  margin: 0px !important;
+  float: right;
+}
+
+.fileTable {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 10px;
+}
+
+td, th {
+  border: 2px solid #ddd;
+  padding: 8px;
+}
+
+tr:nth-child(even){
+  background-color: #f2f2f2;
+}
+
+tr:hover, button:hover {
+  background-color: #ddd;
+}
+
+#dropzone {
+  position: fixed; top: 0; left: 0; 
+  z-index: 9999999999;               
+  width: 100%; height: 100%;         
+  background-color: rgba(0,0,0,0.5);
+  transition: visibility 175ms, opacity 175ms;
+}
+
+#loading {
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(0,0,0,.3);
+  border-radius: 50%;
+  border-top-color: black;
+  animation: spin 1s ease-in-out infinite;
+  -webkit-animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { -webkit-transform: rotate(360deg); }
+}
+@-webkit-keyframes spin {
+  to { -webkit-transform: rotate(360deg); }
+}
