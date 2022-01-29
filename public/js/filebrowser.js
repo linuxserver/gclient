@@ -1,4 +1,3 @@
-var homeDir = '/config';
 var host = window.location.hostname; 
 var port = window.location.port;
 var protocol = window.location.protocol;
@@ -9,7 +8,7 @@ var socket = io(protocol + '//' + host + ':' + port, { path: path + '/socket.io'
 socket.on('connect',function(){
   $('#filebrowser').empty();
   $('#filebrowser').append($('<div>').attr('id','loading'));
-  socket.emit('auth', [$('#pass').val(), homeDir]);
+  socket.emit('auth', $('#pass').val());
 });
 
 // Get file list
@@ -132,7 +131,7 @@ async function upload(input) {
       let reader = new FileReader();
       reader.onload = async function(e) {
         let fileName = file.name;
-        if (e.total < 100000000) {
+        if (e.total < 200000000) {
           let data = e.target.result;
           $('#filebrowser').append($('<div>').text('Uploading ' + fileName));
           if (file == input.files[input.files.length - 1]) {
@@ -176,6 +175,103 @@ function createFolder() {
   $('#filebrowser').empty();
   $('#filebrowser').append($('<div>').attr('id','loading'));
   socket.emit('createfolder', [directoryUp + '/' + folderName, directory]);
+}
+
+// Handle drag and drop
+async function dropFiles(ev) {
+  ev.preventDefault();
+  $('#filebrowser').empty();
+  $('#filebrowser').append($('<div>').attr('id','loading'));
+  $('#dropzone').css({'visibility':'hidden','opacity':0});
+  let directory = $('#filebrowser').data('directory');
+  if (directory == '/') {
+    directoryUp = '';
+  } else {
+    directoryUp = directory;
+  }
+  let items = await getAllFileEntries(event.dataTransfer.items);
+  for await (let item of items) {
+    let fullPath = item.fullPath;
+    item.file(async function(file) {
+      let reader = new FileReader();
+      reader.onload = async function(e) {
+        let fileName = file.name;
+        if (e.total < 200000000) {
+          let data = e.target.result;
+          $('#filebrowser').append($('<div>').text('Uploading ' + fileName));
+          if (item == items[items.length - 1]) {
+            socket.emit('uploadfile', [directory, directoryUp + '/' + fullPath, data, true]);
+          } else {
+            socket.emit('uploadfile', [directory, directoryUp + '/' + fullPath, data, false]);
+          }
+        } else {
+          $('#filebrowser').append($('<div>').text('File too big ' + fileName));
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          socket.emit('getfiles', directory);
+        }
+      }
+      reader.readAsArrayBuffer(file);
+    });
+  }
+}
+// Drop handler function to get all files
+async function getAllFileEntries(dataTransferItemList) {
+  let fileEntries = [];
+  // Use BFS to traverse entire directory/file structure
+  let queue = [];
+  // Unfortunately dataTransferItemList is not iterable i.e. no forEach
+  for (let i = 0; i < dataTransferItemList.length; i++) {
+    queue.push(dataTransferItemList[i].webkitGetAsEntry());
+  }
+  while (queue.length > 0) {
+    let entry = queue.shift();
+    if (entry.isFile) {
+      fileEntries.push(entry);
+    } else if (entry.isDirectory) {
+      let reader = entry.createReader();
+      queue.push(...await readAllDirectoryEntries(reader));
+    }
+  }
+  return fileEntries;
+}
+// Get all the entries (files or sub-directories) in a directory by calling readEntries until it returns empty array
+async function readAllDirectoryEntries(directoryReader) {
+  let entries = [];
+  let readEntries = await readEntriesPromise(directoryReader);
+  while (readEntries.length > 0) {
+    entries.push(...readEntries);
+    readEntries = await readEntriesPromise(directoryReader);
+  }
+  return entries;
+}
+// Wrap readEntries in a promise to make working with readEntries easier
+async function readEntriesPromise(directoryReader) {
+  try {
+    return await new Promise((resolve, reject) => {
+      directoryReader.readEntries(resolve, reject);
+    });
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+var lastTarget;
+// Change style when hover files
+window.addEventListener('dragenter', function(ev) {
+  lastTarget = ev.target;
+  $('#dropzone').css({'visibility':'','opacity':1});
+});
+
+// Change style when leave hover files
+window.addEventListener("dragleave", function(ev) {
+  if(ev.target == lastTarget || ev.target == document) {
+    $('#dropzone').css({'visibility':'hidden','opacity':0});
+  }
+});
+
+// Disabled default drag and drop
+function allowDrop(ev) {
+  ev.preventDefault();
 }
 
 // Incoming socket requests

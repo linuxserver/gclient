@@ -117,6 +117,12 @@ function poposk(){
   $('#Keyboard').toggle(100);
 }
 
+// Render file browser
+function popfiles() {
+  $('#sidebar').toggle(100);
+  $('#files').toggle(100)
+}
+
 // RDP Resize window logic
 var resizeId;
 $(window).resize(function() {

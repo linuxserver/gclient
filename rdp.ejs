@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Guacamole Client</title>
+    <title><%- title -%></title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="icon.png">
@@ -19,6 +19,7 @@
     <!--File Browser-->
     <div id="files">
       <iframe id="files_frame" name="files_frame" src="files" frameborder="0"></iframe>
+      <div class="close" onclick="$('#files').toggle(100)"></div>
     </div>
     <!-- Display -->
     <div id="display"></div>
@@ -26,9 +27,10 @@
     <div id="sidebar">
       <textarea id="clipboard" rows="7" class="stopcapture"></textarea>
       <div class="sidenav" onclick="poposk()">Keyboard</div>
-      <div class="sidenav" onclick="$('#files').toggle(100)">Manage Files</div>
-      <div class="sideclose" onclick="$('#sidebar').toggle(100)"></div>
+      <div class="sidenav" onclick="popfiles()">Manage Files</div>
+      <div class="close" onclick="$('#sidebar').toggle(100)"></div>
     </div>
+    <div id="sideopen" onclick="$('#sidebar').toggle(100)"></div>
     <!-- Storage for encoded connection string -->
     <input type="hidden" id="connectionstring" value="<%- token -%>" />
     <!-- Javascript -->
