@@ -14,7 +14,7 @@ All application settings are passed via environment variables:
 | PASSWORD | Desktop session password for the RDP connection, default abc. |
 | RDP_HOST | IP address of RDP endpoint, default "127.0.0.1". |
 | RDP_PORT | RDP port to connect to, default "3389".(quotes important not an integer) |
-| FORCE_LOGIN | Set to true to force login and avoid using `?login=true` url param, default false. |
+| AUTO_LOGIN | Set to false to disable auto login, default true. |
 | SUBFOLDER | Subfolder for the application if running a subfolder reverse proxy, need both slashes IE `/subfolder/` |
 | TITLE | The page title displayed on the web browser, default "Guacamole Client". |
 | CYPHER | The cipher key to user for encoding the connection string token for guacamole, default "LSIOGCKYLSIOGCKYLSIOGCKYLSIOGCKY" |
