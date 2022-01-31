@@ -45,6 +45,7 @@ button {
   text-decoration: none;
   font-size: 1.2em;
   border-radius: 5px;
+  border:1px solid white;
 }
 
 .sidenav {
@@ -57,7 +58,7 @@ button {
 }
 
 .sidenav:hover {
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(255, 255, 255, 0.3);
 }
 
 #sideopen {
@@ -81,6 +82,7 @@ button {
   border-radius:50%;
   width: 20px;
   height: 20px;
+  border:1px solid white;
 }
 
 #clipboard {

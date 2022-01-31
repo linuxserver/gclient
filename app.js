@@ -6,11 +6,11 @@ var CUSTOM_USER = process.env.CUSTOM_USER || 'abc';
 var PASSWORD = process.env.PASSWORD || 'abc';
 var RDP_HOST = process.env.RDP_HOST || '127.0.0.1';
 var RDP_PORT = process.env.RDP_PORT || '3389';
-var AUTO_LOGIN = process.env.AUTO_LOGIN || true;
+var AUTO_LOGIN = process.env.AUTO_LOGIN || null;
 var SUBFOLDER = process.env.SUBFOLDER || '/';
 var TITLE = process.env.TITLE || 'Guacamole Client';
 var CYPHER =process.env.CYPHER || 'LSIOGCKYLSIOGCKYLSIOGCKYLSIOGCKY';
-var FM_NO_AUTH = process.env.FM_NO_AUTH || false;
+var FM_NO_AUTH = process.env.FM_NO_AUTH || 'false';
 var FM_HOME = process.env.FM_HOME || '/config';
 
 //// Application Variables ////
@@ -70,7 +70,8 @@ baseRouter.get('/', function (req, res) {
       }
     }
   };
-  if ((! req.query.login) || (AUTO_LOGIN == true) || (PASSWORD == 'abc')) {
+  console.log(AUTO_LOGIN);
+  if (((! req.query.login) && (AUTO_LOGIN == 'true')) || ((! req.query.login) && (PASSWORD == 'abc') && (AUTO_LOGIN !== 'false'))) {
     Object.assign(connectString.connection.settings, {'username':CUSTOM_USER,'password':PASSWORD});
   }
   res.render(__dirname + '/rdp.ejs', {token : encrypt(connectString), title: TITLE});
@@ -95,7 +96,7 @@ io.on('connection', async function (socket) {
       username: CUSTOM_USER,
       password: password,
     };
-    if (FM_NO_AUTH) {
+    if (FM_NO_AUTH == 'true') {
       authData = {id: true};
       getFiles(FM_HOME);
       return;
