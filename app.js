@@ -12,6 +12,7 @@ var TITLE = process.env.TITLE || 'Guacamole Client';
 var CYPHER =process.env.CYPHER || 'LSIOGCKYLSIOGCKYLSIOGCKYLSIOGCKY';
 var FM_NO_AUTH = process.env.FM_NO_AUTH || 'false';
 var FM_HOME = process.env.FM_HOME || '/config';
+var KEYBOARD = process.env.KEYBOARD || 'en-us-qwerty';
 
 //// Application Variables ////
 var socketIO = require('socket.io');
@@ -66,7 +67,8 @@ baseRouter.get('/', function (req, res) {
         'hostname': RDP_HOST,
         'port': RDP_PORT,
         'security': 'any',
-        'ignore-cert': true
+        'ignore-cert': true,
+        'server-layout': KEYBOARD
       }
     }
   };
@@ -74,7 +76,7 @@ baseRouter.get('/', function (req, res) {
   if (((! req.query.login) && (AUTO_LOGIN == 'true')) || ((! req.query.login) && (PASSWORD == 'abc') && (AUTO_LOGIN !== 'false'))) {
     Object.assign(connectString.connection.settings, {'username':CUSTOM_USER,'password':PASSWORD});
   }
-  res.render(__dirname + '/rdp.ejs', {token : encrypt(connectString), title: TITLE});
+  res.render(__dirname + '/rdp.ejs', {token : encrypt(connectString), title: TITLE, keyboard: KEYBOARD});
 });
 
 //// Web File Browser ////

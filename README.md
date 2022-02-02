@@ -14,6 +14,7 @@ All application settings are passed via environment variables:
 | PASSWORD | Desktop session password for the RDP connection, default abc. |
 | RDP_HOST | IP address of RDP endpoint, default "127.0.0.1". |
 | RDP_PORT | RDP port to connect to, default "3389".(quotes important not an integer) |
+| KEYBOARD | Keyboard layout to use, default "en-us-qwerty". (see keyboard section for available layouts) |
 | AUTO_LOGIN | Set to false to disable auto login or true to force it, default unset. |
 | SUBFOLDER | Subfolder for the application if running a subfolder reverse proxy, need both slashes IE `/subfolder/` |
 | TITLE | The page title displayed on the web browser, default "Guacamole Client". |
@@ -32,6 +33,25 @@ By exposing the sidebar menu you will see a text box where text can be entered a
 ### On screen keyboard
 
 This is geared towards touch interfaces, though we currently do not optimize for mobile, for tablets with a decent resolution it should be somewhat useable. The reason mobile is not a great experience is the desktop itself is always rendered at a pixel perfect resolution, even resizing the window will reconnect your session to re-render the desktop. At low phone resolutions a normal IDE has difficulty rendering even basic tools.
+
+#### Keyboard Layouts
+
+The keyboard layouts available for use are:
+* en-us-qwerty- English (US) keyboard - **OSK available**
+* en-gb-qwerty- English (UK) keyboard
+* de-ch-qwertz- Swiss German keyboard (qwertz)
+* de-de-qwertz- German keyboard (qwertz) - **OSK available**
+* fr-fr-azerty- French keyboard (azerty) - **OSK available**
+* fr-ch-qwertz- Swiss French keyboard (qwertz)
+* it-it-qwerty- Italian keyboard - **OSK available**
+* ja-jp-qwerty- Japanese keyboard
+* pt-br-qwerty- Portuguese Brazilian keyboard
+* es-es-qwerty- Spanish keyboard - **OSK available**
+* sv-se-qwerty- Swedish keyboard
+* tr-tr-qwerty- Turkish-Q keyboard
+* failsafe- this option sends only Unicode events, while supported by the Gucamole RDP client it does not have a linked keymap from xrdp so it will not function as intended. (left here for documentation purposes)
+
+In general while testing localization for keymaps things like right alt for keyboard modifiers would get stuck among other issues. Best effort is made to support this feature, but you might have to pop open the on screen keyboard from time to time to unstick modifier keys.
 
 ### File manager
 
