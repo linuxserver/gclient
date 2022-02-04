@@ -37,16 +37,17 @@ This is geared towards touch interfaces, though we currently do not optimize for
 #### Keyboard Layouts
 
 The keyboard layouts available for use are:
-* en-us-qwerty- English (US) keyboard - **OSK available**
-* en-gb-qwerty- English (UK) keyboard
+* da-dk-qwerty- Danish keyboard
 * de-ch-qwertz- Swiss German keyboard (qwertz)
 * de-de-qwertz- German keyboard (qwertz) - **OSK available**
-* fr-fr-azerty- French keyboard (azerty) - **OSK available**
+* en-gb-qwerty- English (UK) keyboard
+* en-us-qwerty- English (US) keyboard - **OSK available** **DEFAULT**
+* es-es-qwerty- Spanish keyboard - **OSK available**
 * fr-ch-qwertz- Swiss French keyboard (qwertz)
+* fr-fr-azerty- French keyboard (azerty) - **OSK available**
 * it-it-qwerty- Italian keyboard - **OSK available**
 * ja-jp-qwerty- Japanese keyboard
 * pt-br-qwerty- Portuguese Brazilian keyboard
-* es-es-qwerty- Spanish keyboard - **OSK available**
 * sv-se-qwerty- Swedish keyboard
 * tr-tr-qwerty- Turkish-Q keyboard
 * failsafe- this option sends only Unicode events, while supported by the Gucamole RDP client it does not have a linked keymap from xrdp so it will not function as intended. (left here for documentation purposes)
