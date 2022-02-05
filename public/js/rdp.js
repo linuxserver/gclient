@@ -11,6 +11,7 @@ $(document).keyup(function (e) {
 });
 
 //// Guacamole related ////
+var guac;
 // Get display div from document
 var display = document.getElementById('display');
 // Instantiate client, using an HTTP tunnel for communications.
@@ -24,93 +25,105 @@ if (protocol == 'http:') {
   var wsproto = 'wss:';
 }
 var path = window.location.pathname;
-var guac = new Guacamole.Client(
-  new Guacamole.WebSocketTunnel(wsproto + '//' + host + ':' + port + path + 'guaclite?token=' + connectionstring + '&width=' + $(document).width() + '&height=' + $(document).height())
-);
-// Show current client clipboard
-guac.onclipboard = function clientClipboardReceived(stream, mimetype) {
-  var reader;
-  // If the received data is text, read it as a simple string (ignore blob data)
-  if (/^text\//.exec(mimetype)) {
-    reader = new Guacamole.StringReader(stream);
-    // Assemble received data into a single string
-    reader.ontext = function textReceived(text) {
-      $('#clipboard').val(text);
+// Guac logic loop
+function runGuac(reset) {
+  guac = new Guacamole.Client(
+    new Guacamole.WebSocketTunnel(wsproto + '//' + host + ':' + port + path + 'guaclite?token=' + connectionstring + '&width=' + $(document).width() + '&height=' + $(document).height())
+  );
+  // Add client to display div
+  display.appendChild(guac.getDisplay().getElement());
+  // Connect
+  guac.connect();
+  // Show current client clipboard
+  guac.onclipboard = function clientClipboardReceived(stream, mimetype) {
+    var reader;
+    // If the received data is text, read it as a simple string (ignore blob data)
+    if (/^text\//.exec(mimetype)) {
+      reader = new Guacamole.StringReader(stream);
+      // Assemble received data into a single string
+      reader.ontext = function textReceived(text) {
+        $('#clipboard').val(text);
+      };
+    }
+  };
+  // Error handler
+  guac.onerror = function(error) {
+    $('#display').empty();
+    $('#display').append(
+      '<center><h1>Error Connecting to Desktop</h1><br><p>'
+       + JSON.stringify(error) + '</p>');
+  };
+  // Mouse
+  var mouse = new Guacamole.Mouse(guac.getDisplay().getElement());
+  mouse.onmousedown =
+  mouse.onmouseup   =
+  mouse.onmousemove = function(mouseState) {
+    guac.sendMouseState(mouseState);
+  };
+  // Touchscreen
+  $('#display').bind('touchmove', function(e) {
+    e.preventDefault();
+    let touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
+    guac.sendMouseState({'x': Math.round(touch.pageX),"y": Math.round(touch.pageY)})
+  });
+  var touch = new Guacamole.Mouse.Touchscreen(guac.getDisplay().getElement());
+  touch.onmousedown =
+  touch.onmouseup   =
+  touch.onmousemove = function(mouseState) {
+    guac.sendMouseState(mouseState);
+  };
+  // Audio
+  guac.onaudio = function clientAudio(stream, mimetype) {
+    let context = Guacamole.AudioContextFactory.getAudioContext();
+    context.resume().then(() => console.log('play audio'));
+  };
+  console.log(guac);
+  if (!reset) {
+    // Keyboard
+    var keyboard = new Guacamole.Keyboard(document);
+    keyboard.onkeydown = function (keysym) {
+      guac.sendKeyEvent(1, keysym);
     };
+    keyboard.onkeyup = function (keysym) {
+      guac.sendKeyEvent(0, keysym);
+    };
+    // Disable keyboard events if our sidebar inputs are used
+    $(".stopcapture").click(function(e) {
+      keyboard.onkeydown = null;
+      keyboard.onkeyup = null;
+    }).on("blur", function(e) {
+      keyboard.onkeydown = function(keysym) {
+        guac.sendKeyEvent(1, keysym);
+      };
+      keyboard.onkeyup = function(keysym) {
+        guac.sendKeyEvent(0, keysym);
+      };
+    });
   }
-};
-// Grab user input to set client clipboard
-$('#clipboard').on('input', function() { 
-  guac.setClipboard($(this).val());
-});
-// Add client to display div
-display.appendChild(guac.getDisplay().getElement());
-// Error handler
-guac.onerror = function(error) {
-  $('#display').empty();
-  $('#display').append(
-    '<center><h1>Error Connecting to Desktop</h1><br><p>' 
-     + JSON.stringify(error) + '</p>');
-};
-// Connect
-guac.connect();
+}
+
 // Disconnect on close
 window.onunload = function() {
   guac.disconnect();
 };
-// Mouse
-var mouse = new Guacamole.Mouse(guac.getDisplay().getElement());
-mouse.onmousedown = 
-mouse.onmouseup   =
-mouse.onmousemove = function(mouseState) {
-  guac.sendMouseState(mouseState);
-};
-// Touchscreen
-var touch = new Guacamole.Mouse.Touchscreen(guac.getDisplay().getElement());
-touch.onmousedown = 
-touch.onmouseup   =
-touch.onmousemove = function(mouseState) {
-  guac.sendMouseState(mouseState);
-};
-// Keyboard
-var keyboard = new Guacamole.Keyboard(document);
-keyboard.onkeydown = function (keysym) {
-  guac.sendKeyEvent(1, keysym);
-};
-keyboard.onkeyup = function (keysym) {
-  guac.sendKeyEvent(0, keysym);
-};
-// Audio
-guac.onaudio = function clientAudio(stream, mimetype) {
-  let context = Guacamole.AudioContextFactory.getAudioContext();
-  context.resume().then(() => console.log('play audio'));
-};
-// Disable keyboard events if our sidebar inputs are used
-$(".stopcapture").click(function(e) {
-  keyboard.onkeydown = null;
-  keyboard.onkeyup = null;
-}).on("blur", function(e) {
-  keyboard.onkeydown = function(keysym) {
-    guac.sendKeyEvent(1, keysym);
-  };
-  keyboard.onkeyup = function(keysym) {
-    guac.sendKeyEvent(0, keysym);
-  };
+// Grab user input to set client clipboard
+$('#clipboard').on('input', function() {
+  guac.setClipboard($(this).val());
 });
 // When On Screen Keyboard is launched render keyboard
-var keyboard = $('#keyboard').val();
+var keyboardLayout = $('#keyboard').val();
 function poposk(){
   // Close the sidebar
   $('#sidebar').toggle(100);
   // Create the element for the keyboard and append it to the modal
   let layout = en_us_qwerty;
-  if (keyboard == 'de-de-qwertz') {
+  if (keyboardLayout == 'de-de-qwertz') {
     layout = de_de_qwertz;
-  } else if (keyboard == 'fr-fr-azerty') {
+  } else if (keyboardLayout == 'fr-fr-azerty') {
     layout = fr_fr_azerty;
-  } else if (keyboard == 'it-it-qwerty') {
+  } else if (keyboardLayout == 'it-it-qwerty') {
     layout = it_it_qwerty;
-  } else if (keyboard == 'es-es-qwerty') {
+  } else if (keyboardLayout == 'es-es-qwerty') {
     layout = es_es_qwerty;
   }
   let osk = new Guacamole.OnScreenKeyboard(layout);
@@ -134,14 +147,36 @@ function popfiles() {
   $('#files').toggle(100)
 }
 
-// RDP Resize window logic
-var resizeId;
-$(window).resize(function() {
-  clearTimeout(resizeId);
-  resizeId = setTimeout(doneResizing, 500);
-});
-function doneResizing(){
-  document.location.reload(true);
+// Resize screen to window
+function resize(){
+  guac.disconnect();
+  $('#display').empty();
+  runGuac(true);
+}
+
+// Go fullscreen
+async function fullscreen() {
+  let page = document.documentElement;
+  if (document.fullscreenElement) {
+    document.exitFullscreen();
+    await new Promise(resolve => setTimeout(resolve, 200));
+    resize();
+  } else {
+    if (page.requestFullscreen) {
+      page.requestFullscreen();
+    } else if (page.webkitRequestFullscreen) {
+      page.webkitRequestFullscreen();
+    } else if (page.msRequestFullscreen) {
+      page.msRequestFullscreen();
+    }
+    await new Promise(resolve => setTimeout(resolve, 200));
+    resize();
+  }
+}
+
+// Run main logic on load
+window.onload = function() { 
+  runGuac(false);
 }
 
 //// On Screen keyboards ////
