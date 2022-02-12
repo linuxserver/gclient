@@ -15,6 +15,7 @@ var FM_HOME = process.env.FM_HOME || '/config';
 var KEYBOARD = process.env.KEYBOARD || 'en-us-qwerty';
 
 //// Application Variables ////
+var package_info = require('./package.json');
 var socketIO = require('socket.io');
 var crypto = require('crypto');
 var ejs = require('ejs');
@@ -76,6 +77,11 @@ baseRouter.get('/', function (req, res) {
     Object.assign(connectString.connection.settings, {'username':CUSTOM_USER,'password':PASSWORD});
   }
   res.render(__dirname + '/rdp.ejs', {token : encrypt(connectString), title: TITLE, keyboard: KEYBOARD});
+});
+
+//// Web app manifest ////
+baseRouter.get('/manifest.json', function (req, res) {
+  res.render(__dirname + '/manifest.ejs', {version: package_info.version, title: TITLE});
 });
 
 //// Web File Browser ////

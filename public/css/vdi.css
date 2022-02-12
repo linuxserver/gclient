@@ -39,26 +39,40 @@ button {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  color: white;
   z-index: 2;
-  background: rgba(0, 0, 0, 0.3);
-  text-decoration: none;
-  font-size: 1.2em;
-  border-radius: 5px;
-  border:1px solid white;
+  width: 20vw;
+  height: 30vh;
 }
 
-.sidenav {
-  width: 100%;
+.menu {
+  white-space: nowrap;
+}
+
+.icons {
+  margin-right: 1px;
+  margin-left: 1px;
+  padding: 4px;
+  height: 6vh;
+  width: 3.7vw;
   cursor: pointer;
-  text-align: center;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  border-radius: 5px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.3);
+  filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(82deg) brightness(105%) contrast(105%);
 }
 
-.sidenav:hover {
+.menu-vert {
+}
+
+.icons-vert {
+  margin-right: 1px;
+  margin-left: 1px;
+  padding: 4px;
+  height: 6vh;
+  width: 20vw;
+  cursor: pointer;
+  border-radius: 3px;
   background: rgba(255, 255, 255, 0.3);
+  filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(82deg) brightness(105%) contrast(105%);
 }
 
 #sideopen {
@@ -68,9 +82,9 @@ button {
   top: 50%;
   transform: translateY(-50%);
   border-radius:50%;
-  width: 20px;
-  height: 20px;
-  border:1px solid white;
+  width: 18px;
+  height: 18px;
+  border: 2px solid white;
 }
 
 .close {
@@ -82,11 +96,14 @@ button {
   border-radius:50%;
   width: 20px;
   height: 20px;
-  border:1px solid white;
+  border: 2px solid white;
 }
 
 #clipboard {
   border-radius: 5px;
+  height: 20vh;
+  width: 19.55vw;
+  resize: none;
 }
 
 /* On Screen Keyboard */
@@ -97,7 +114,7 @@ button {
   bottom: 0;
   left: 0;
   width: 100vw;
-  opacity: 0.5;
+  opacity: 0.8;
   z-index: 2;
   background: rgba(0, 0, 0, 0.1);
 }
