@@ -77,7 +77,6 @@ function runGuac(reset) {
     let context = Guacamole.AudioContextFactory.getAudioContext();
     context.resume().then(() => console.log('play audio'));
   };
-  console.log(guac);
   if (!reset) {
     // Keyboard
     var keyboard = new Guacamole.Keyboard(document);

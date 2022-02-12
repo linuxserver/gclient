@@ -72,7 +72,6 @@ baseRouter.get('/', function (req, res) {
       }
     }
   };
-  console.log(AUTO_LOGIN);
   if (((! req.query.login) && (AUTO_LOGIN == 'true')) || ((! req.query.login) && (PASSWORD == 'abc') && (AUTO_LOGIN !== 'false'))) {
     Object.assign(connectString.connection.settings, {'username':CUSTOM_USER,'password':PASSWORD});
   }
