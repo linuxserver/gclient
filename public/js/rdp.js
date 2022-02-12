@@ -61,57 +61,6 @@ function runGuac(reset) {
   mouse.onmousemove = function(mouseState) {
     guac.sendMouseState(mouseState);
   };
-  // Touchscreen
-  var timeOut = 1000;
-  var timer;
-  var timerFired;
-  var startX;
-  var startY;
-  $('#display').bind('touchmove', function(e) {
-    e.preventDefault();
-    let touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
-    let xPos = Math.round(touch.pageX);
-    let yPos = Math.round(touch.pageY);
-    if ((Math.abs(yPos - startY) > 1) || (Math.abs(xPos - startX) > 1)) {
-      startX = 0;
-      startY = 0;
-      clearTimeout(timer);
-      touchState.left = true;
-      touchState.x = xPos;
-      touchState.y = yPos;
-      guac.sendMouseState(touchState);
-    }
-  });
-  $('#display').bind('touchstart', function(e) {
-    e.preventDefault();
-    let touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
-    startX = Math.round(touch.pageX);
-    startY = Math.round(touch.pagey);
-    touchState.x = Math.round(touch.pageX);
-    touchState.y = Math.round(touch.pageY);
-    guac.sendMouseState(touchState);
-    timer = setTimeout(function() {
-      touchState.left = false;
-      touchState.right = true;
-      guac.sendMouseState(touchState);
-      touchState.right = false;
-      guac.sendMouseState(touchState);
-      timerFired = true;
-    }, timeOut);
-  });
-  $('#display').bind('touchend', function(e) {
-    e.preventDefault();
-    clearTimeout(timer);
-    if (timerFired) {
-      timerFired = false;
-    } else {
-      touchState.left = true;
-    }
-    guac.sendMouseState(touchState);
-    touchState.left = false;
-    touchState.right = false;
-    guac.sendMouseState(touchState);
-  });
   // Audio
   guac.onaudio = function clientAudio(stream, mimetype) {
     let context = Guacamole.AudioContextFactory.getAudioContext();
@@ -137,6 +86,57 @@ function runGuac(reset) {
       keyboard.onkeyup = function(keysym) {
         guac.sendKeyEvent(0, keysym);
       };
+    });
+    // Touchscreen
+    var timeOut = 1000;
+    var timer;
+    var timerFired;
+    var startX;
+    var startY;
+    $('#display').bind('touchmove', function(e) {
+      e.preventDefault();
+      let touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
+      let xPos = Math.round(touch.pageX);
+      let yPos = Math.round(touch.pageY);
+      if ((Math.abs(yPos - startY) > 1) || (Math.abs(xPos - startX) > 1)) {
+        startX = 0;
+        startY = 0;
+        clearTimeout(timer);
+        touchState.left = true;
+        touchState.x = xPos;
+        touchState.y = yPos;
+        guac.sendMouseState(touchState);
+      }
+    });
+    $('#display').bind('touchstart', function(e) {
+      e.preventDefault();
+      let touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
+      startX = Math.round(touch.pageX);
+      startY = Math.round(touch.pagey);
+      touchState.x = Math.round(touch.pageX);
+      touchState.y = Math.round(touch.pageY);
+      guac.sendMouseState(touchState);
+      timer = setTimeout(function() {
+        touchState.left = false;
+        touchState.right = true;
+        guac.sendMouseState(touchState);
+        touchState.right = false;
+        guac.sendMouseState(touchState);
+        timerFired = true;
+      }, timeOut);
+    });
+    $('#display').bind('touchend', function(e) {
+      e.preventDefault();
+      clearTimeout(timer);
+      if (timerFired) {
+        timerFired = false;
+      } else {
+        touchState.left = true;
+      }
+      guac.sendMouseState(touchState);
+      touchState.left = false;
+      touchState.right = false;
+      guac.sendMouseState(touchState);
     });
   }
 }
