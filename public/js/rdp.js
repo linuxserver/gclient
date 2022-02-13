@@ -12,6 +12,7 @@ $(document).keyup(function (e) {
 
 //// Guacamole related ////
 var guac;
+var context;
 // Get display div from document
 var display = document.getElementById('display');
 // Instantiate client, using an HTTP tunnel for communications.
@@ -61,11 +62,15 @@ function runGuac(reset) {
   mouse.onmousemove = function(mouseState) {
     guac.sendMouseState(mouseState);
   };
-  // Audio
-  guac.onaudio = function clientAudio(stream, mimetype) {
-    let context = Guacamole.AudioContextFactory.getAudioContext();
-    context.resume().then(() => console.log('play audio'));
-  };
+  // Audio (bind after user interaction)
+  $(window).bind('touchstart click', function(){
+    if (!context) {
+      guac.onaudio = function clientAudio(stream, mimetype) {
+        context = Guacamole.AudioContextFactory.getAudioContext();
+        context.resume().then(() => console.log('play audio'));
+      };
+    }
+  });
   if (!reset) {
     // Keyboard
     var keyboard = new Guacamole.Keyboard(document);
@@ -98,7 +103,7 @@ function runGuac(reset) {
       let touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
       let xPos = Math.round(touch.pageX);
       let yPos = Math.round(touch.pageY);
-      if ((Math.abs(yPos - startY) > 1) || (Math.abs(xPos - startX) > 1)) {
+      if ((Math.abs(yPos - startY) > 2) || (Math.abs(xPos - startX) > 2)) {
         startX = 0;
         startY = 0;
         clearTimeout(timer);
@@ -132,11 +137,11 @@ function runGuac(reset) {
         timerFired = false;
       } else {
         touchState.left = true;
+        guac.sendMouseState(touchState);
+        touchState.left = false;
+        touchState.right = false;
+        guac.sendMouseState(touchState);
       }
-      guac.sendMouseState(touchState);
-      touchState.left = false;
-      touchState.right = false;
-      guac.sendMouseState(touchState);
     });
   }
 }
