@@ -98,16 +98,23 @@ function runGuac(reset) {
     var timerFired;
     var startX;
     var startY;
+    var touched;
     $('#display').bind('touchmove', function(e) {
       e.preventDefault();
       let touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
       let xPos = Math.round(touch.pageX);
       let yPos = Math.round(touch.pageY);
-      if ((Math.abs(yPos - startY) > 2) || (Math.abs(xPos - startX) > 2)) {
-        startX = 0;
-        startY = 0;
-        clearTimeout(timer);
-        touchState.left = true;
+      if (touched) {
+        if ((Math.abs(yPos - startY) > 2) || (Math.abs(xPos - startX) > 2)) {
+          startX = 0;
+          startY = 0;
+          clearTimeout(timer);
+          touchState.left = true;
+          touchState.x = xPos;
+          touchState.y = yPos;
+          guac.sendMouseState(touchState);
+        }
+      } else {
         touchState.x = xPos;
         touchState.y = yPos;
         guac.sendMouseState(touchState);
@@ -115,6 +122,7 @@ function runGuac(reset) {
     });
     $('#display').bind('touchstart', function(e) {
       e.preventDefault();
+      touched = true;
       let touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
       startX = Math.round(touch.pageX);
       startY = Math.round(touch.pagey);
@@ -132,6 +140,7 @@ function runGuac(reset) {
     });
     $('#display').bind('touchend', function(e) {
       e.preventDefault();
+      touched = false;
       clearTimeout(timer);
       if (timerFired) {
         timerFired = false;
@@ -238,6 +247,51 @@ $(window).resize(function() {
   } else {
     $('.menu-vert').addClass('menu').removeClass('menu-vert');
     $('.icons-vert').addClass('icons').removeClass('icons-vert');
+  }
+});
+
+// Draggable open button
+var dragX;
+var dragY;
+var draggable;
+$('#sideopen').bind('mousedown', function(e) {
+  dragX = Math.round(e.pageX);
+  dragY = Math.round(e.pagey);
+  draggable = true;
+});
+$('#sideopen').bind('mouseup', function(e) {
+  draggable = false;
+});
+$('#sideopen').bind('mousemove', function(e) {
+  let dragStateX = Math.round(e.pageX);
+  let dragStateY = Math.round(e.pageY);
+  if (((Math.abs(dragStateY - dragY) > 1) || (Math.abs(dragStateX - dragX) > 2)) && (draggable)) {
+    dragX = 0;
+    dragY = 0;
+    $('#sideopen').css({top: (dragStateY - 1), left: (dragStateX - 10)});
+  }
+});
+$('#sideopen').bind('touchstart', function(e) {
+  e.preventDefault();
+  let touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
+  dragX = Math.round(touch.pageX);
+  dragY = Math.round(touch.pageY);
+  draggable = true;
+});
+$('#sideopen').bind('touchend', function(e) {
+  e.preventDefault();
+  draggable = false;
+  $('#sidebar').toggle(100);
+});
+$('#sideopen').bind('touchmove', function(e) {
+  e.preventDefault();
+  let touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
+  let dragStateX = Math.round(touch.pageX);
+  let dragStateY = Math.round(touch.pageY);
+  if (((Math.abs(dragStateY - dragY) > 1) || (Math.abs(dragStateX - dragX) > 2)) && (draggable)) {
+    dragX = 0;
+    dragY = 0;
+    $('#sideopen').css({top: (dragStateY - 1), left: (dragStateX - 10)});
   }
 });
 
