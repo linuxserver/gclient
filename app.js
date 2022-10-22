@@ -69,6 +69,7 @@ baseRouter.get('/', function (req, res) {
         'port': RDP_PORT,
         'security': 'any',
         'ignore-cert': true,
+        'resize-method': 'display-update',
         'server-layout': KEYBOARD
       }
     }

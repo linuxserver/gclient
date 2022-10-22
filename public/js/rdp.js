@@ -28,7 +28,7 @@ if (protocol == 'http:') {
 var path = window.location.pathname;
 // Guac logic loop
 var touchState = {down:false,left:false,middle:false,right:false,up:false,x:0,y:0};
-function runGuac(reset) {
+function runGuac() {
   guac = new Guacamole.Client(
     new Guacamole.WebSocketTunnel(wsproto + '//' + host + ':' + port + path + 'guaclite?token=' + connectionstring + '&width=' + $(document).width() + '&height=' + $(document).height())
   );
@@ -71,88 +71,86 @@ function runGuac(reset) {
       };
     }
   });
-  if (!reset) {
-    // Keyboard
-    var keyboard = new Guacamole.Keyboard(document);
-    keyboard.onkeydown = function (keysym) {
+  // Keyboard
+  var keyboard = new Guacamole.Keyboard(document);
+  keyboard.onkeydown = function (keysym) {
+    guac.sendKeyEvent(1, keysym);
+  };
+  keyboard.onkeyup = function (keysym) {
+    guac.sendKeyEvent(0, keysym);
+  };
+  // Disable keyboard events if our sidebar inputs are used
+  $(".stopcapture").click(function(e) {
+    keyboard.onkeydown = null;
+    keyboard.onkeyup = null;
+  }).on("blur", function(e) {
+    keyboard.onkeydown = function(keysym) {
       guac.sendKeyEvent(1, keysym);
     };
-    keyboard.onkeyup = function (keysym) {
+    keyboard.onkeyup = function(keysym) {
       guac.sendKeyEvent(0, keysym);
     };
-    // Disable keyboard events if our sidebar inputs are used
-    $(".stopcapture").click(function(e) {
-      keyboard.onkeydown = null;
-      keyboard.onkeyup = null;
-    }).on("blur", function(e) {
-      keyboard.onkeydown = function(keysym) {
-        guac.sendKeyEvent(1, keysym);
-      };
-      keyboard.onkeyup = function(keysym) {
-        guac.sendKeyEvent(0, keysym);
-      };
-    });
-    // Touchscreen
-    var timeOut = 1000;
-    var timer;
-    var timerFired;
-    var startX;
-    var startY;
-    var touched;
-    $('#display').bind('touchmove', function(e) {
-      e.preventDefault();
-      let touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
-      let xPos = Math.round(touch.pageX);
-      let yPos = Math.round(touch.pageY);
-      if (touched) {
-        if ((Math.abs(yPos - startY) > 2) || (Math.abs(xPos - startX) > 2)) {
-          startX = 0;
-          startY = 0;
-          clearTimeout(timer);
-          touchState.left = true;
-          touchState.x = xPos;
-          touchState.y = yPos;
-          guac.sendMouseState(touchState);
-        }
-      } else {
+  });
+  // Touchscreen
+  var timeOut = 1000;
+  var timer;
+  var timerFired;
+  var startX;
+  var startY;
+  var touched;
+  $('#display').bind('touchmove', function(e) {
+    e.preventDefault();
+    let touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
+    let xPos = Math.round(touch.pageX);
+    let yPos = Math.round(touch.pageY);
+    if (touched) {
+      if ((Math.abs(yPos - startY) > 2) || (Math.abs(xPos - startX) > 2)) {
+        startX = 0;
+        startY = 0;
+        clearTimeout(timer);
+        touchState.left = true;
         touchState.x = xPos;
         touchState.y = yPos;
         guac.sendMouseState(touchState);
       }
-    });
-    $('#display').bind('touchstart', function(e) {
-      e.preventDefault();
-      touched = true;
-      let touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
-      startX = Math.round(touch.pageX);
-      startY = Math.round(touch.pagey);
-      touchState.x = Math.round(touch.pageX);
-      touchState.y = Math.round(touch.pageY);
+    } else {
+      touchState.x = xPos;
+      touchState.y = yPos;
       guac.sendMouseState(touchState);
-      timer = setTimeout(function() {
-        touchState.left = false;
-        touchState.right = true;
-        guac.sendMouseState(touchState);
-        touchState.right = false;
-        guac.sendMouseState(touchState);
-        timerFired = true;
-      }, timeOut);
-    });
-    $('#display').bind('touchend', function(e) {
-      e.preventDefault();
-      touched = false;
-      clearTimeout(timer);
-      if (timerFired) {
-        timerFired = false;
-      } else {
-        touchState.left = true;
-        guac.sendMouseState(touchState);
-        touchState.left = false;
-        touchState.right = false;
-        guac.sendMouseState(touchState);
-      }
-    });
-  }
+    }
+  });
+  $('#display').bind('touchstart', function(e) {
+    e.preventDefault();
+    touched = true;
+    let touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
+    startX = Math.round(touch.pageX);
+    startY = Math.round(touch.pagey);
+    touchState.x = Math.round(touch.pageX);
+    touchState.y = Math.round(touch.pageY);
+    guac.sendMouseState(touchState);
+    timer = setTimeout(function() {
+      touchState.left = false;
+      touchState.right = true;
+      guac.sendMouseState(touchState);
+      touchState.right = false;
+      guac.sendMouseState(touchState);
+      timerFired = true;
+    }, timeOut);
+  });
+  $('#display').bind('touchend', function(e) {
+    e.preventDefault();
+    touched = false;
+    clearTimeout(timer);
+    if (timerFired) {
+      timerFired = false;
+    } else {
+      touchState.left = true;
+      guac.sendMouseState(touchState);
+      touchState.left = false;
+      touchState.right = false;
+      guac.sendMouseState(touchState);
+    }
+  });
 }
 
 // Disconnect on close
@@ -200,13 +198,6 @@ function popfiles() {
   $('#files').toggle(100)
 }
 
-// Resize screen to window
-function resize(){
-  guac.disconnect();
-  $('#display').empty();
-  runGuac(true);
-}
-
 // Go fullscreen
 async function fullscreen() {
   let page = document.documentElement;
@@ -236,19 +227,56 @@ window.onload = function() {
     $('.menu-vert').addClass('menu').removeClass('menu-vert');
     $('.icons-vert').addClass('icons').removeClass('icons-vert');
   }
-  runGuac(false);
+  runGuac();
 }
 
-// Handle style changes for vertical menu
-$(window).resize(function() {
-  if ($(window).width() < 700) {
+// Resize screen to window
+function resize(){
+  let newWidth = Math.round($(display).width());
+  let newHeight = Math.round($(display).height());
+  if (newWidth < 700) {
     $('.menu').addClass('menu-vert').removeClass('menu');
     $('.icons').addClass('icons-vert').removeClass('icons');
   } else {
     $('.menu-vert').addClass('menu').removeClass('menu-vert');
     $('.icons-vert').addClass('icons').removeClass('icons-vert');
   }
-});
+  guac.sendSize(newWidth, newHeight);
+}
+
+// Debounce
+function debounce(func, wait, immediate) {
+  var timeout;
+  return function executedFunction() {
+    var context = this;
+    var args = arguments;
+    var later = function() {
+      timeout = null;
+      if (!immediate) func.apply(context, args);
+    };
+    var callNow = immediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (callNow) func.apply(context, args);
+  };
+};
+
+// Handle resize
+var resize = debounce(function() {
+  let newWidth = Math.round($(display).width());
+  let newHeight = Math.round($(display).height());
+  if (newWidth < 700) {
+    $('.menu').addClass('menu-vert').removeClass('menu');
+    $('.icons').addClass('icons-vert').removeClass('icons');
+  } else {
+    $('.menu-vert').addClass('menu').removeClass('menu-vert');
+    $('.icons-vert').addClass('icons').removeClass('icons-vert');
+  }
+  guac.sendSize(newWidth, newHeight);
+}, 200);
+
+// Listen for resize
+window.addEventListener('resize', resize);
 
 // Draggable open button
 var dragX;

@@ -1,6 +1,6 @@
 {
   "name": "GClient",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "description": "LinuxServer Guacamole Client",
   "main": "app.js",
   "scripts": {
